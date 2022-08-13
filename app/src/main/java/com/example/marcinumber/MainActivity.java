@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         if (v.getId() == ids[nyerobuttonid]) {
             text.setText("IGEEEN!");
 
-            button.setBackgroundColor(Color.GREEN);
+            //button.setBackgroundColor(Color.GREEN);
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     text.setText("");
-                    button.setBackgroundColor(Color.BLUE);
+                    //button.setBackgroundColor(Color.BLUE);
                     button1.setEnabled(true);
                     button2.setEnabled(true);
                     button3.setEnabled(true);
@@ -165,11 +165,11 @@ public class MainActivity extends AppCompatActivity {
             hit++;
         } else {
             text.setText("NEM NEM!");
-            button.setBackgroundColor(Color.RED);
+            //button.setBackgroundColor(Color.RED);
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    button.setBackgroundColor(Color.BLUE);
+                    //button.setBackgroundColor(Color.BLUE);
                     text.setText("");
                     button1.setEnabled(true);
                     button2.setEnabled(true);
@@ -227,13 +227,13 @@ public class MainActivity extends AppCompatActivity {
         Button button1 = (Button) findViewById(R.id.button1);
         Button button2 = (Button) findViewById(R.id.button2);
         Button button3 = (Button) findViewById(R.id.button3);
-        button1.setBackgroundColor(Color.BLUE);
-        button2.setBackgroundColor(Color.BLUE);
-        button3.setBackgroundColor(Color.BLUE);
+        //button1.setBackgroundColor(Color.BLUE);
+        //button2.setBackgroundColor(Color.BLUE);
+        //button3.setBackgroundColor(Color.BLUE);
 
-        button1.setTextColor(Color.WHITE);
-        button2.setTextColor(Color.WHITE);
-        button3.setTextColor(Color.WHITE);
+        //button1.setTextColor(Color.WHITE);
+        //button2.setTextColor(Color.WHITE);
+        //button3.setTextColor(Color.WHITE);
 
         Button nyerobutton = (Button) findViewById(ids[nyerobuttonid]);
 
@@ -255,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
 
         nyerobutton.setText(String.valueOf(nyeroszam));
 
+        //text.setOnClickListener(this::onClick1);
 
         button1.setOnClickListener(this::onClick);
         button2.setOnClickListener(this::onClick);
