@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
@@ -31,8 +32,10 @@ public class MainActivity extends AppCompatActivity {
     public int a_max = 99;
     public int b_min = 0;
     public int b_max = 99;
-    public int minutes = 0;
+    public int minutes = 5;
     public Calendar startTime;
+    public int colorsave;
+    public boolean errorInQuest = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +44,26 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         TextView text = (TextView) findViewById(R.id.winstate);
-        TextView remaining = (TextView) findViewById(R.id.remaining);
         text.setText("");
         TextView results = (TextView) findViewById(R.id.results);
+        results.setOnLongClickListener(this::onLongClick);
         results.setText("0 / 0\n0%");
+        TextView button1 = (TextView) findViewById(R.id.button1);
+        TextView button2 = (TextView) findViewById(R.id.button2);
+        TextView button3 = (TextView) findViewById(R.id.button3);
+        colorsave = button1.getCurrentTextColor();
+        button1.setTypeface(null, Typeface.BOLD);
+        button2.setTypeface(null, Typeface.BOLD);
+        button3.setTypeface(null, Typeface.BOLD);
         showTimeDialog();
+        newQuest();
+
+
+
+    }
+
+    private void timeUpdater() {
+        TextView remaining = (TextView) findViewById(R.id.remaining);
 
         new Thread(new Runnable() {
             @Override
@@ -58,12 +76,14 @@ public class MainActivity extends AppCompatActivity {
 
                     long diff = milliseconds2 - milliseconds1;
                     long remain = TimeUnit.MINUTES.toMillis(minutes) - diff;
-                    int remainsecs = (int) TimeUnit.MILLISECONDS.toSeconds(remain);
+                    long minutes = (remain / 1000)  / 60;
+                    int seconds = (int)((remain / 1000) % 60);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (remainsecs >= 0) {
-                                remaining.setText(String.valueOf(remainsecs));
+                            if (seconds >= 0) {
+
+                                remaining.setText(String.valueOf(minutes) + ":" + String.format("%02d", seconds));
                             }
                         }
                     });
@@ -78,14 +98,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
 
-        startTime = Calendar.getInstance();
-        newQuest();
+
 
     }
 
     private void showTimeDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Title");
+        AlertDialog dialog;
+
+        builder.setTitle("Playing time (minutes)");
 
 // Set up the input
         final EditText input = new EditText(this);
@@ -95,10 +116,13 @@ public class MainActivity extends AppCompatActivity {
         builder.setView(input);
 
 // Set up the buttons
+
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 minutes = Integer.valueOf(input.getText().toString());
+                startTime = Calendar.getInstance();
+                timeUpdater();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -107,44 +131,86 @@ public class MainActivity extends AppCompatActivity {
                 dialog.cancel();
             }
         });
-
-        builder.show();
+        dialog = builder.create();
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        dialog.show();
 
     }
 
+    private void reEnable() {
+        TextView button1 = (TextView) findViewById(R.id.button1);
+        TextView button2 = (TextView) findViewById(R.id.button2);
+        TextView button3 = (TextView) findViewById(R.id.button3);
+
+        //button1.setEnabled(true);
+        //button2.setEnabled(true);
+        //button3.setEnabled(true);
+        button1.setVisibility(View.VISIBLE);
+        button2.setVisibility(View.VISIBLE);
+        button3.setVisibility(View.VISIBLE);
+        button1.setOnClickListener(this::onClick);
+        button2.setOnClickListener(this::onClick);
+        button3.setOnClickListener(this::onClick);
+        button1.setTextColor(colorsave);
+        button2.setTextColor(colorsave);
+        button3.setTextColor(colorsave);
+        button1.setAlpha((float)1);
+        button2.setAlpha((float)1);
+        button3.setAlpha((float)1);
+
+    }
+
+    private void disable() {
+        TextView button1 = (TextView) findViewById(R.id.button1);
+        TextView button2 = (TextView) findViewById(R.id.button2);
+        TextView button3 = (TextView) findViewById(R.id.button3);
+
+        //button1.setEnabled(false);
+        //button2.setEnabled(false);
+        //button3.setEnabled(false);
+        button1.setOnClickListener(null);
+        button2.setOnClickListener(null);
+        button3.setOnClickListener(null);
+    }
+
+    private Boolean onLongClick(View v) {
+        newQuest();
+        return true;
+    }
+
+
     private void onClick(View v) {
         TextView text = (TextView) findViewById(R.id.winstate);
-        Button button = (Button) findViewById(v.getId());
+        TextView button = (TextView) findViewById(v.getId());
         Handler handler = new Handler();
-        Button button1 = (Button) findViewById(R.id.button1);
-        Button button2 = (Button) findViewById(R.id.button2);
-        Button button3 = (Button) findViewById(R.id.button3);
+        TextView button1 = (TextView) findViewById(R.id.button1);
+        TextView button2 = (TextView) findViewById(R.id.button2);
+        TextView button3 = (TextView) findViewById(R.id.button3);
 
-        button1.setEnabled(false);
-        button2.setEnabled(false);
-        button3.setEnabled(false);
+        for (int i = 0; i < 3; i++) {
+            if (v.getId() != ids[i]) {
+                ((TextView) findViewById(ids[i])).setAlpha((float)0.3);
+            }
+        }
+
         if (v.getId() == ids[nyerobuttonid]) {
             text.setText("IGEEEN!");
-
-            //button.setBackgroundColor(Color.GREEN);
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    TextView haha = (TextView) findViewById(R.id.haha1);
-                    haha.setText(haha.getText() + " = " + button.getText());
-
-                }
-            }, 500);
+            if (!errorInQuest) {
+                hit++;
+            }
+            total++;
+            errorInQuest = false;
+            disable();
+            button.setTextColor(Color.GREEN);
+            TextView haha = (TextView) findViewById(R.id.haha1);
+            haha.setText(haha.getText() + " = " + button.getText());
 
 
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     text.setText("");
-                    //button.setBackgroundColor(Color.BLUE);
-                    button1.setEnabled(true);
-                    button2.setEnabled(true);
-                    button3.setEnabled(true);
+
                     Calendar nowTime = Calendar.getInstance();
                     long milliseconds1 = startTime.getTimeInMillis();
                     long milliseconds2 = nowTime.getTimeInMillis();
@@ -158,28 +224,33 @@ public class MainActivity extends AppCompatActivity {
                         ((TextView) findViewById(R.id.haha1)).setVisibility(View.GONE);
                         text.setText("END");
                     } else {
+                        button.setTextColor(colorsave);
+
+                        reEnable();
                         newQuest();
                     }
                 }
             }, 4000);
-            hit++;
+
         } else {
+            disable();
             text.setText("NEM NEM!");
-            //button.setBackgroundColor(Color.RED);
+            errorInQuest = true;
+
+            button.setTextColor(Color.RED);
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    //button.setBackgroundColor(Color.BLUE);
+                    button.setTextColor(colorsave);
                     text.setText("");
-                    button1.setEnabled(true);
-                    button2.setEnabled(true);
-                    button3.setEnabled(true);
+                    reEnable();
+
 
                 }
             }, 2000);
 
         }
-        total++;
+
         TextView results = (TextView) findViewById(R.id.results);
         results.setText(String.valueOf(hit) + " / " + String.valueOf(total)+"\n"+String.valueOf((int) Math.round((double)hit/total*100)) + "%");
     }
@@ -197,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void newQuest() {
+        Handler handler = new Handler();
 
         Random rand = new Random();
         int a = 0;
@@ -224,9 +296,9 @@ public class MainActivity extends AppCompatActivity {
             text.setText(String.valueOf(a) + " + " + String.valueOf(b));
             nyeroszam = a + b;
         }
-        Button button1 = (Button) findViewById(R.id.button1);
-        Button button2 = (Button) findViewById(R.id.button2);
-        Button button3 = (Button) findViewById(R.id.button3);
+        TextView button1 = (TextView) findViewById(R.id.button1);
+        TextView button2 = (TextView) findViewById(R.id.button2);
+        TextView button3 = (TextView) findViewById(R.id.button3);
         //button1.setBackgroundColor(Color.BLUE);
         //button2.setBackgroundColor(Color.BLUE);
         //button3.setBackgroundColor(Color.BLUE);
@@ -235,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
         //button2.setTextColor(Color.WHITE);
         //button3.setTextColor(Color.WHITE);
 
-        Button nyerobutton = (Button) findViewById(ids[nyerobuttonid]);
+        TextView nyerobutton = (TextView) findViewById(ids[nyerobuttonid]);
 
         ArrayList<Integer> eddigiek = new ArrayList<Integer>();
 
@@ -256,11 +328,20 @@ public class MainActivity extends AppCompatActivity {
         nyerobutton.setText(String.valueOf(nyeroszam));
 
         //text.setOnClickListener(this::onClick1);
+        button1.setVisibility(View.GONE);
+        button2.setVisibility(View.GONE);
+        button3.setVisibility(View.GONE);
+        button1.setOnClickListener(null);
+        button3.setOnClickListener(null);
+        button2.setOnClickListener(null);
 
-        button1.setOnClickListener(this::onClick);
-        button2.setOnClickListener(this::onClick);
-        button3.setOnClickListener(this::onClick);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                reEnable();
 
+            }
+        }, 3000);
 
     }
 }
